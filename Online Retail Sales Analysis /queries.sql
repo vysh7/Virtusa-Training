@@ -15,23 +15,24 @@ GROUP BY c.name
 ORDER BY total_spent DESC;
 
 -- Monthly Revenue
-SELECT TO_CHAR(o.order_date, 'YYYY-MM') AS month,
+SELECT DATE_FORMAT(o.order_date, '%Y-%m') AS month,
        SUM(oi.quantity * p.price) AS revenue
 FROM Orders o
 JOIN Order_Items oi ON o.order_id = oi.order_id
 JOIN Products p ON oi.product_id = p.product_id
-GROUP BY TO_CHAR(o.order_date, 'YYYY-MM')
+GROUP BY month
 ORDER BY month;
 
 -- Category-wise Sales
-SELECT p.category, SUM(oi.quantity * p.price) AS total_sales
+SELECT cat.category_name, SUM(oi.quantity * p.price) AS total_sales
 FROM Order_Items oi
 JOIN Products p ON oi.product_id = p.product_id
-GROUP BY p.category;
+JOIN Categories cat ON p.category_id = cat.category_id
+GROUP BY cat.category_name;
 
 -- Inactive Customers
 SELECT c.name
 FROM Customers c
 WHERE c.customer_id NOT IN (
-    SELECT DISTINCT customer_id FROM Orders
+    SELECT customer_id FROM Orders
 );
